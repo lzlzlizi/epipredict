@@ -127,9 +127,9 @@ knnarx_forecaster <- function(x, y, key_vars, time_value,
 #' @export
 #'
 #' @examples
-#' arx_args_list()
-#' arx_args_list(symmetrize = FALSE)
-#' arx_args_list(levels = c(.1, .3, .7, .9), min_train_window = 120)
+#' knnarx_args_list()
+#' knnarx_args_list(symmetrize = FALSE)
+#' knnarx_args_list(levels = c(.1, .3, .7, .9), min_train_window = 120)
 knnarx_args_list <- function(lags = c(0, 7, 14),
                              query_window_len = 50,
                              topK = 500,

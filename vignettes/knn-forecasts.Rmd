@@ -1,8 +1,8 @@
 ---
-title: "Simple forecasts"
+title: "KNN AR(X) forecasts"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Simple forecasts}
+  %\VignetteIndexEntry{KNN AR(X) forecasts}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -29,9 +29,10 @@ library(tensr)
 ```
 
 
-In this vignette, we reproduce the simple forecasting activity described in the [`epiprocess` "Advanced sliding..." vignette](https://cmu-delphi.github.io/epiprocess/articles/advanced.html#version-aware-forecasting-revisited-1). We then go on to demonstrate a similar activity with a more advanced forecaster and on data from another source.
+In this vignette, we explore the KNN enhanced forecasting strategies.
 
-## Reproducing the ARX forecaster
+
+## KNN Enhanced Direct ARX Forecastor
 
 First, we download the data and process as before (hidden).
 
@@ -75,7 +76,7 @@ epix_merge(
 We now make forecasts on the archive and compare to forecasts on the latest
 data. 
 
-```{r make-arx-kweek}
+```{r make-knnarx-kweek}
 # Latest snapshot of data, and forecast dates
 x_latest <- epix_as_of(x, max_version = max(x$DT$version))
 fc_time_values <- seq(as.Date("2020-10-01"), as.Date("2021-12-01"), 
@@ -90,7 +91,7 @@ k_week_ahead <- function(ahead = 7, as_of = TRUE) {
         args = knnarx_args_list(ahead = ahead,
                       lags = c(1,7,14),
                       query_window_len = 32,
-                      topK = 300,
+                      topK = 1000,
                       intercept = FALSE)),
         n = Inf, ref_time_values = fc_time_values) %>%
       mutate(target_date = time_value + ahead, as_of = as_of,
@@ -102,7 +103,7 @@ k_week_ahead <- function(ahead = 7, as_of = TRUE) {
         args = knnarx_args_list(ahead = ahead,
                       lags = c(1,7,14),
                       query_window_len = 32,
-                      topK = 300,
+                      topK = 1000,
                        intercept = FALSE)),
         n = Inf, ref_time_values = fc_time_values) %>%
       mutate(target_date = time_value + ahead, as_of = as_of)
@@ -118,9 +119,6 @@ fc <- bind_rows(
 
 
 
-
-These look generally not great, but that's because we've only used two locations, and they're behaviour is rather different.
-
 ```{r plot-smooth, message = FALSE, warning = FALSE, fig.width = 9, fig.height = 18}
 ggplot(fc %>% filter(as_of == TRUE), aes(x = target_date, group = time_value)) +
   geom_vline(aes(xintercept = time_value), linetype = 2, alpha = 0.5) +
@@ -134,6 +132,80 @@ ggplot(fc %>% filter(as_of == TRUE), aes(x = target_date, group = time_value)) +
   labs(x = "Date", y = "Reported COVID-19 case rates") +
   theme(legend.position = "none")
 ```
+
+## KNN Enhanced Iterative AR Forecastor
+
+For the moment, the KNN Enhanced iterative forecasting strategy only support the AR forecastor, which means it can only deal with one signal each time. Same as the direct example, the following pipeline run predictions with the iterative forecasting strategy.
+
+```{r make-iterative-knnar-kweek, message = FALSE, warning = FALSE, fig.width = 9, fig.height = 18}
+ahead <- 21
+final_iterative <- x %>%
+  epix_slide(
+    fc = knn_iteraive_ar_forecaster(
+      NULL, case_rate, geo_value, time_value,
+      args = knn_iteraive_ar_args_list(
+        ahead = ahead,
+        lags = c(1, 7, 14),
+        query_window_len = 32,
+        topK = 1000,
+        symmetrize = FALSE,
+        update_model = FALSE
+      )
+    ) %>% nest_by(key_vars),
+    n = Inf, ref_time_values = fc_time_values
+  ) %>% unnest(fc_data) %>% 
+  mutate(target_date = time_value + ahead, as_of = TRUE) %>%
+  rename(geo_value = fc_key_vars)
+
+ggplot(final_iterative, aes(x = target_date, group = time_value)) +
+  geom_vline(aes(xintercept = time_value), linetype = 2, alpha = 0.5) +
+  geom_line(data = x_latest  , aes(x = time_value, y = case_rate),
+            inherit.aes = FALSE, color = "gray50") +
+  geom_ribbon(aes(ymin = q0.05, ymax = q0.95, fill = geo_value), alpha = 0.4) +
+  geom_line(aes(y = point)) +
+  geom_point(aes(y = point), size = 0.5) +
+  facet_wrap(~ geo_value, ncol = 4, scales = "free_y") +
+  scale_x_date(minor_breaks = "month", date_labels = "%b %y") +
+  labs(x = "Date", y = "Reported COVID-19 case rates") +
+  theme(legend.position = "none")
+```
+
+
+
+The `update_model` parameter in the iterative forecastor API decides if the one-step ahead model will be updated or not during the iterative predicting procedure. The following pipeline shows the results with this trigger turned on.
+
+```{r make-dynamiciterative-knnar-kweek, message = FALSE, warning = FALSE, fig.width = 9, fig.height = 18}
+final_dynamiciterative <- x %>%
+  epix_slide(
+    fc = knn_iteraive_ar_forecaster(
+      NULL, case_rate, geo_value, time_value,
+      args = knn_iteraive_ar_args_list(
+        ahead = ahead,
+        lags = c(1, 7, 14),
+        query_window_len = 32,
+        topK = 1000,
+        symmetrize = FALSE,
+        update_model = TRUE
+      )
+    ) %>% nest_by(key_vars),
+    n = Inf, ref_time_values = fc_time_values
+  ) %>% unnest(fc_data) %>% 
+  mutate(target_date = time_value + ahead, as_of = TRUE) %>%
+  rename(geo_value = fc_key_vars)
+
+ggplot(final_dynamiciterative, aes(x = target_date, group = time_value)) +
+  geom_vline(aes(xintercept = time_value), linetype = 2, alpha = 0.5) +
+  geom_line(data = x_latest  , aes(x = time_value, y = case_rate),
+            inherit.aes = FALSE, color = "gray50") +
+  geom_ribbon(aes(ymin = q0.05, ymax = q0.95, fill = geo_value), alpha = 0.4) +
+  geom_line(aes(y = point)) +
+  geom_point(aes(y = point), size = 0.5) +
+  facet_wrap(~ geo_value, ncol = 4, scales = "free_y") +
+  scale_x_date(minor_breaks = "month", date_labels = "%b %y") +
+  labs(x = "Date", y = "Reported COVID-19 case rates") +
+  theme(legend.position = "none")
+```
+
 
 ## Using data for Canada
 
