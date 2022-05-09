@@ -81,6 +81,8 @@ in autoregressive-type models.</p></dd>
 <dt>query_window_len</dt>
 <dd><p>Integer. Length of the query window
 for KNN searching.</p></dd>
+<dt>topK</dt>
+<dd><p>Integer. Number of most similar training samples.</p></dd>
 <dt>ahead</dt>
 <dd><p>Integer. Number of time steps ahead of the forecast date
 for which forecasts should be produced.</p></dd>
@@ -106,8 +108,6 @@ by hard-thresholding at 0.</p></dd>
 <dt>update_model</dt>
 <dd><p>Logical. The default <code>TRUE</code> updates the
 one-step ahead model every time for iterative forecasting strategy.</p></dd>
-<dt>topk</dt>
-<dd><p>Integer. Number of most similar training samples.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
