@@ -111,7 +111,7 @@
         args <span class="op">=</span> <span class="fu"><a href="../reference/knnarx_args_list.html">knnarx_args_list</a></span><span class="op">(</span>ahead <span class="op">=</span> <span class="va">ahead</span>,
                       lags <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">7</span>,<span class="fl">14</span><span class="op">)</span>,
                       query_window_len <span class="op">=</span> <span class="fl">32</span>,
-                      topK <span class="op">=</span> <span class="fl">1000</span>,
+                      topK <span class="op">=</span> <span class="fl">100</span>,
                       intercept <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span>,
         n <span class="op">=</span> <span class="cn">Inf</span>, ref_time_values <span class="op">=</span> <span class="va">fc_time_values</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
       <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>target_date <span class="op">=</span> <span class="va">time_value</span> <span class="op">+</span> <span class="va">ahead</span>, as_of <span class="op">=</span> <span class="va">as_of</span>,
@@ -123,7 +123,7 @@
         args <span class="op">=</span> <span class="fu"><a href="../reference/knnarx_args_list.html">knnarx_args_list</a></span><span class="op">(</span>ahead <span class="op">=</span> <span class="va">ahead</span>,
                       lags <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">7</span>,<span class="fl">14</span><span class="op">)</span>,
                       query_window_len <span class="op">=</span> <span class="fl">32</span>,
-                      topK <span class="op">=</span> <span class="fl">1000</span>,
+                      topK <span class="op">=</span> <span class="fl">100</span>,
                        intercept <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span>,
         n <span class="op">=</span> <span class="cn">Inf</span>, ref_time_values <span class="op">=</span> <span class="va">fc_time_values</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
       <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>target_date <span class="op">=</span> <span class="va">time_value</span> <span class="op">+</span> <span class="va">ahead</span>, as_of <span class="op">=</span> <span class="va">as_of</span><span class="op">)</span>
@@ -163,7 +163,7 @@
         ahead <span class="op">=</span> <span class="va">ahead</span>,
         lags <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">7</span>, <span class="fl">14</span><span class="op">)</span>,
         query_window_len <span class="op">=</span> <span class="fl">32</span>,
-        topK <span class="op">=</span> <span class="fl">1000</span>,
+        topK <span class="op">=</span> <span class="fl">100</span>,
         symmetrize <span class="op">=</span> <span class="cn">FALSE</span>,
         update_model <span class="op">=</span> <span class="cn">FALSE</span>
       <span class="op">)</span>
@@ -195,7 +195,7 @@
         ahead <span class="op">=</span> <span class="va">ahead</span>,
         lags <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">7</span>, <span class="fl">14</span><span class="op">)</span>,
         query_window_len <span class="op">=</span> <span class="fl">32</span>,
-        topK <span class="op">=</span> <span class="fl">1000</span>,
+        topK <span class="op">=</span> <span class="fl">100</span>,
         symmetrize <span class="op">=</span> <span class="cn">FALSE</span>,
         update_model <span class="op">=</span> <span class="cn">TRUE</span>
       <span class="op">)</span>
